@@ -19,68 +19,27 @@ const plus = [[0, 0, 0, 6, 0, 0, 0],
 
 # [num rows, num cols]
 const grid_size = [5,7]
-const tile_scale_factor = 0.25
-const sprite_size = 512
 
-# 2d array containing sprites
-var grid_tex = []
-# 2d array containing numbers that refer to each element
-var grid_matrix = []
-
-const textures_dict = {
-	"null": null,
-	"fire": preload("res://Assets/UI/Tiles/Tile_Fire.png"),
-	"water": preload("res://Assets/UI/Tiles/Tile_Water.png"),
-	"electric": preload("res://Assets/UI/Tiles/Tile_Electric.png"),
-	"grass": preload("res://Assets/UI/Tiles/Tile_Grass.png"),
-	"psychic": preload("res://Assets/UI/Tiles/Tile_Psychic.png"),
-	"berry": preload("res://Assets/UI/Tiles/Tile_Berry.png")}
-var texture_arr = textures_dict.values()
+# 2d array containing tiles
+var grid = []
 
 onready var np = $Numpy
+var Tile = load("res://Scenes/Levels/Level Components/Tile.tscn")
+var rng = RandomNumberGenerator.new()
 
 func _ready():
 	rng.randomize()
-	create_empty_grid()
 	initialize_grid()
-	$Tween.interpolate_callback(self, 1, "remove_matched_tiles_and_fill_grid", match_stairs)
-	$Tween.start()
-	# remove_matched_tiles_and_fill_grid(match_stairs)
-	# remove_matched_tiles_and_fill_grid(find_matches_in_grid())
-	print_grid("grid", grid_matrix)
+	remove_matched_tiles_and_fill_grid(find_matches_in_grid(), true)
 
-var rng = RandomNumberGenerator.new()
-
-func generate_tile_index():
-	return (rng.randi() % (len(texture_arr)-1))+1
-
-# Add empty sprites to grid_tex and creates 0's for grid_matrix
-func create_empty_grid():
+# Create all tiles and randomly pick textures
+func initialize_grid():
 	for y in range(grid_size[0]):
 		var row = []
 		for x in range(grid_size[1]):
-			row.append(create_new_tile(y, x))
-		grid_tex.append(row)
-	grid_matrix = np.zeros(grid_size)
-
-func create_new_tile(y, x):
-	var sprite = Sprite.new()
-	sprite.centered = false
-	sprite.scale *= tile_scale_factor
-	sprite.position = get_tile_position(y, x)
-	add_child(sprite)
-	return sprite
-
-# Takes in grid position, returns pixel position
-func get_tile_position(y, x):
-	return Vector2(x, y) * sprite_size * tile_scale_factor
-
-# Randomly pick textures
-func initialize_grid():
-	for y in range(grid_size[0]):
-		for x in range(grid_size[1]):
-			grid_matrix[y][x] = generate_tile_index()
-			grid_tex[y][x].texture = texture_arr[grid_matrix[y][x]]
+			row.append(Tile.instance().init(y, x, rng.randi(), self))
+			add_child(row[-1])
+		grid.append(row)
 
 # Returns a 2d array where tiles that aren't part of a match are 0.
 # Tiles that are part of a match retain their number.
@@ -88,17 +47,17 @@ func find_matches_in_grid():
 	var matches = np.zeros(grid_size)
 	for y in range(grid_size[0]):
 		for x in range(grid_size[1]):
-			var curr_tile = grid_matrix[y][x]
+			var curr_tile = grid[y][x].value
 			# Check for matches above the curr tile
 			if y - 2 >= 0:
-				if grid_matrix[y - 1][x] == curr_tile and grid_matrix[y - 2][x] == curr_tile:
+				if grid[y - 1][x].value == curr_tile and grid[y - 2][x].value == curr_tile:
 					matches[y][x] = curr_tile
 					matches[y - 1][x] = curr_tile
 					matches[y - 2][x] = curr_tile
 
 			# Check for matches to the left of the curr tile
 			if x - 2 >= 0:
-				if grid_matrix[y][x - 1] == curr_tile and grid_matrix[y][x - 2] == curr_tile:
+				if grid[y][x - 1].value == curr_tile and grid[y][x - 2].value == curr_tile:
 					matches[y][x] = curr_tile
 					matches[y][x - 1] = curr_tile
 					matches[y][x - 2] = curr_tile
@@ -146,7 +105,7 @@ func check_for_extra_move():
 					return true
 	return false
 
-func remove_matched_tiles_and_fill_grid(matches):
+func remove_matched_tiles_and_fill_grid(matches, animate=true):
 	matches = matches.duplicate()
 	
 	# Remove the tiles that are part of a match
@@ -176,9 +135,8 @@ func remove_matched_tiles_and_fill_grid(matches):
 				# Create a new tile
 				if unmatched_tile_coordinate == null:
 					num_new_tiles_in_columns += 1
-					grid_matrix[y][x] = generate_tile_index()
-					grid_tex[y][x] = create_new_tile(-num_new_tiles_in_columns, x)
-					grid_tex[y][x].texture = texture_arr[grid_matrix[y][x]]
+					grid[y][x] = Tile.instance().init(-num_new_tiles_in_columns, x, rng.randi(), self)
+					add_child(grid[y][x])
 				# Shift down existing tile
 				else:
 					var new_y = unmatched_tile_coordinate[0]
@@ -250,7 +208,66 @@ func find_unmatched_tile(y, x, matches):
 # Prints any grid along with its name
 func print_grid(name, grid):
 	print("Start of " + name + " Grid")
-	for y in range(len(grid)):
-		print(grid[y])
+	for y in range(grid_size[0]):
+		var row = ""
+		for x in range(grid_size[1]):
+			row += str(grid[y][x].value) + " "
+		print(row)
 	print("End of " + name + " Grid")
 	print("")
+
+var selected_tile = null
+var in_middle_of_swap = false
+func select_tile(tile):
+	if not in_middle_of_swap:
+		if selected_tile == null:
+			selected_tile = tile
+		elif tile.can_swap(selected_tile):
+			swap(tile, selected_tile)
+			selected_tile = null
+		elif selected_tile == tile:
+			selected_tile = null
+
+var animation_durations = [0]
+func animate():
+	$Tween.start()
+	yield(get_tree().create_timer(animation_durations.max()), "timeout")
+	animation_durations = [0]
+
+func interpolate(object, destination, duration, curr_position):
+	$Tween.interpolate_property(object, "rect_position", curr_position, destination, duration, $Tween.TRANS_BOUNCE, $Tween.EASE_OUT)
+
+# Returns an array where each index contains the number of tiles matches of that type
+# Eg: [0,0,3,0,0,0,0] = 3 water tiles
+func get_matches_array(matches):
+	var matches_array = np.zeros([7])
+	for row in matches:
+		for elem in row:
+			matches_array[elem] += 1
+	return matches_array
+
+signal swap_start
+signal swap_end
+signal collect_mana
+func swap(tile1, tile2):
+	emit_signal("swap_start")
+	in_middle_of_swap = true
+	
+	var y1 = tile1.location[0]
+	var x1 = tile1.location[1]
+	var y2 = tile2.location[0]
+	var x2 = tile2.location[1]
+	
+	grid[y2][x2] = tile1
+	grid[y1][x1] = tile2
+	
+	animation_durations.append(tile1.move_tile(y2, x2, true))
+	animation_durations.append(tile2.move_tile(y1, x1, true))
+	yield(animate(), "completed")
+	
+	while np.sum2d(find_matches_in_grid()):
+		emit_signal("collect_mana", get_matches_array(find_matches_in_grid()))
+		yield(remove_matched_tiles_and_fill_grid(find_matches_in_grid(), true), "completed")
+	
+	in_middle_of_swap = false
+	emit_signal("swap_end")

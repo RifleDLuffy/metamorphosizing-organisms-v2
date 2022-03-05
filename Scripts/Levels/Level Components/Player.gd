@@ -11,6 +11,10 @@ var berries = 0
 
 func init(organism1, organism2, _pname, _game):
 	self.organisms = [organism1, organism2]
+	add_child(organism1)
+	add_child(organism2)
+	organism1.position = Vector2(0, 300)
+	organism1.position = Vector2(0, 600)
 	self.pname = _pname
 	self.game = _game
 	return self

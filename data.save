@@ -1,27 +1,66 @@
 [{
   "base_organism": 
-  {"name": "bonzumi", 
-  "ability": "flare",
-  "ability_description": "Flare: Attacks for 20 HP and matches 1 random columns."},
+		{"name": "béllama", 
+		"ability": "sear",
+	  "ability_description": "Sear: Attacks for 20 HP and matches 1 random columns."},
 
   "evolved_organism":
-  {"name": "bonzire", 
-  "ability": "flare_p",
-  "ability_description": "Flare+: Attacks for 25 HP and matches 2 random columns."},
+		{"name": "confuego", 
+		"ability": "desear",
+		"ability_description": "Desear: Attacks for 25 HP and matches 2 random columns."},
 
   "mana_type": "fire",
   "mana_to_activate": 8
 },{
   "base_organism": 
-      {"name": "pelijet", 
-      "ability": "hydro_rush",
-      "ability_description": "Hydro Rush: Attacks for 10 HP and converts 2 random tiles to Water."},
-      
+		{"name": "libesai", 
+		"ability": "splash",
+		"ability_description": "Splash: Attacks for 10 HP and converts 2 random tiles to Water."},
+		
   "evolved_organism":
-      {"name": "sephanix", 
-      "ability": "hydro_rush_p",
-      "ability_description": "Hydro Rush+: Attacks for 20 HP and converts 3 random tiles to Water."},
+		{"name": "chevamo", 
+		"ability": "crash",
+		"ability_description": "Crash: Attacks for 20 HP and converts 3 random tiles to Water."},
 
-   "mana_type": "water",
-   "mana_to_activate": 6
- }]
+  "mana_type": "water",
+  "mana_to_activate": 6
+},{
+	"base_organism": 
+		{"name": "digenstil", 
+		"ability": "shock",
+		"ability_description": "Shock: Attacks for 15 HP and drains 2 Mana from the opponent's monsters."},
+		
+  "evolved_organism":
+		{"name": "digenstil", 
+		"ability": "awe",
+		"ability_description": "Awe: Attacks for 20 HP and drains 3 Mana from the opponent's monsters."},
+
+  "mana_type": "psychic",
+  "mana_to_activate": 6
+},{
+	"base_organism": 
+		{"name": "ruusei", 
+		"ability": "perseverance",
+		"ability_description": "Perseverance: Attacks for 5 HP and heals 5 HP at the end of turn for 3 turns."},
+		
+  "evolved_organism":
+		{"name": "ruusei", 
+		"ability": "fortitude",
+		"ability_description": "Fortitude: Attacks for 10 HP and heals 10 HP at the end of turn for 2 turns."},
+
+  "mana_type": "grass",
+  "mana_to_activate": 6
+},{
+	"base_organism": 
+		{"name": "trimenta", 
+		"ability": "ovation",
+		"ability_description": "Ovation: Attacks for 10 HP and grants 1 extra move for the next turn."},
+		
+  "evolved_organism":
+		{"name": "trimenta", 
+		"ability": "encore",
+		"ability_description": "Fortitude: Attacks for 15 HP and grants 1 extra move for the next 2 turns."},
+
+  "mana_type": "electric",
+  "mana_to_activate": 7
+}]

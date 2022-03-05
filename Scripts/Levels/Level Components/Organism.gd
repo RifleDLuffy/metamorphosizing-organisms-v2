@@ -5,6 +5,7 @@ var oname
 var ability
 var ability_description
 var mana_type
+var mana_enum
 var mana_to_activate
 var player
 var game
@@ -37,9 +38,13 @@ func init(_id, _oname, _ability, _ability_description, _mana_type, _mana_to_acti
 	self.ability = _ability
 	self.ability_description = _ability_description
 	self.mana_type = _mana_type
+	mana_enum = ManaTex.enum(_mana_type)
 	self.mana_to_activate = _mana_to_activate
 	self.player = _player
 	self.game = _game
+	$Mana_Icon.texture = ManaTex.dict[_mana_type]
+	$Mana_Bar.max_value = _mana_to_activate
+	update_ui()
 	return self
 
 func evolve():
@@ -53,6 +58,7 @@ func change_mana(delta):
 	# Clamping mana
 	var prev_mana = mana
 	mana = clamp(mana + delta, 0, mana_to_activate)
+	update_ui()
 	# Returning the amount change in mana
 	return abs(mana - prev_mana)
 
@@ -65,8 +71,8 @@ func flare_p():
 	game.grid.force_grid_match([-1,1,2])
 
 func update_ui():
-	$Mana_Bar.value = float(mana) / float(mana_to_activate)
-	$Mana_Text.text = mana.str + "/" + mana_to_activate.str
+	$Mana_Bar.value = mana
+	$Mana_Text.text = str(mana) + "/" + str(mana_to_activate)
 	
 func show_berry_actions():
 	$Berry_Control.show()

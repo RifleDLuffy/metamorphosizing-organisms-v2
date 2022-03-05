@@ -4,7 +4,7 @@
 [ext_resource path="res://Scripts/Levels/Level Components/Grid.gd" type="Script" id=2]
 
 [node name="Grid" type="Node2D"]
-position = Vector2( 0, 128 )
+position = Vector2( 383.567, 316.787 )
 script = ExtResource( 2 )
 
 [node name="Numpy" parent="." instance=ExtResource( 1 )]

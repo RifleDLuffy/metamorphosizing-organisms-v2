@@ -19,3 +19,10 @@ func zeros(array):
 				row[j] = 0
 			retval.append(row)
 	return retval
+
+func sum2d(array):
+	var retval = 0
+	for row in array:
+		for elem in row:
+			retval += elem
+	return retval

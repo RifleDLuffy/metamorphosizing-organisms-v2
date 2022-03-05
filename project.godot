@@ -39,6 +39,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Dex="*res://Scripts/Levels/Level Components/Dex.gd"
+ManaTex="*res://Scripts/Levels/Level Components/Mana Textures.gd"
 
 [display]
 

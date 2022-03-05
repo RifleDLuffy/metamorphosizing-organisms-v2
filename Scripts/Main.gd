@@ -20,6 +20,7 @@ const LOCAL_HOST = "127.0.0.1"
 var players = {}
 
 remotesync var player_index
+# Contains the player objects
 var players_for_level_main = [null, null]
 
 remotesync func change_to_select_mon_scene(scene_str, _world_str):

@@ -1,11 +1,9 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Scenes/Levels/Level Components/Organism.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scripts/Levels/Level Main.gd" type="Script" id=2]
-[ext_resource path="res://Scripts/Levels/Level Components/Organism.gd" type="Script" id=3]
 [ext_resource path="res://Assets/UI/Player/Game_Player_Turn_Icon_1.png" type="Texture" id=4]
 [ext_resource path="res://Assets/UI/Player/Game_Player_Moves_Icon_Active.png" type="Texture" id=5]
-[ext_resource path="res://Scenes/Levels/Level Components/Player.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Assets/UI/Player/Game_Player_Turn_Icon_2.png" type="Texture" id=7]
 [ext_resource path="res://Assets/Fonts/Font_50.tres" type="DynamicFont" id=8]
 [ext_resource path="res://Assets/Fonts/Frick_Regular.tres" type="DynamicFont" id=9]
@@ -117,6 +115,13 @@ margin_right = 1286.0
 margin_bottom = 461.0
 texture = ExtResource( 5 )
 
+[node name="Move_Icon_3" type="TextureRect" parent="CanvasLayer/Match_Control/Moves_Control/Moves_Container"]
+visible = false
+margin_left = 1032.0
+margin_right = 1544.0
+margin_bottom = 461.0
+texture = ExtResource( 5 )
+
 [node name="Player1_Turn" type="Sprite" parent="CanvasLayer"]
 position = Vector2( 600, 225.641 )
 scale = Vector2( 0.25, 0.25 )
@@ -136,41 +141,6 @@ rect_scale = Vector2( 0.407958, 0.407958 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="Player 1" parent="CanvasLayer/Players" instance=ExtResource( 6 )]
-position = Vector2( 105.972, 40.9915 )
-rotation = 0.181514
-
-[node name="Player 2" parent="CanvasLayer/Players" instance=ExtResource( 6 )]
-position = Vector2( 3958.61, 40.9916 )
-rotation = -0.181514
-
-[node name="Organisms" type="Control" parent="CanvasLayer"]
-margin_left = 334.101
-margin_top = 513.11
-margin_right = 374.101
-margin_bottom = 553.11
-rect_scale = Vector2( 0.710139, 0.710139 )
-script = ExtResource( 3 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="P1_Organism_1" parent="CanvasLayer/Organisms" instance=ExtResource( 1 )]
-position = Vector2( -112.909, 56.2471 )
-scale = Vector2( 0.5, 0.5 )
-
-[node name="P1_Organism_2" parent="CanvasLayer/Organisms" instance=ExtResource( 1 )]
-position = Vector2( -112.909, 519.538 )
-scale = Vector2( 0.5, 0.5 )
-
-[node name="P2_Organism_1" parent="CanvasLayer/Organisms" instance=ExtResource( 1 )]
-position = Vector2( 1910.44, 56.2471 )
-scale = Vector2( 0.5, 0.5 )
-
-[node name="P2_Organism_2" parent="CanvasLayer/Organisms" instance=ExtResource( 1 )]
-position = Vector2( 1910.44, 525.913 )
-scale = Vector2( 0.5, 0.5 )
 
 [node name="Help" type="Button" parent="CanvasLayer"]
 margin_left = 1787.81
