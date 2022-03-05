@@ -23,6 +23,9 @@ var max_moves = 2
 var curr_time = 0
 const time_per_move = 30
 
+const sprite_move_active = preload("res://Assets/UI/Player/Game_Player_Moves_Icon_Active.png");
+const sprite_move_used = preload("res://Assets/UI/Player/Game_Player_Moves_Icon_Used.png")
+
 func init(_world_str):
 	world_str = _world_str
 	return self
@@ -89,7 +92,6 @@ func after_process():
 	if curr_player.berries >= curr_player.max_berries:
 		for organism in curr_player.organisms:
 			organism.show_berry_actions()
-	
 	if curr_moves == 0:
 		change_to_next_player()
 		start_turn()
