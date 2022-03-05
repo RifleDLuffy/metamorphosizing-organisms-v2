@@ -17,6 +17,9 @@ var max_moves = 2
 var curr_time = 0
 var time_per_move = 30
 
+const sprite_move_active = preload("res://Assets/UI/Player/Game_Player_Moves_Icon_Active.png");
+const sprite_move_used = preload("res://Assets/UI/Player/Game_Player_Moves_Icon_Used.png")
+
 func init(_world_str):
 	world_str = _world_str
 	return self
@@ -90,12 +93,12 @@ func update_moves():
 	
 	for x in curr_moves:
 		var texture = TextureRect.new()
-		texture.texture = "res://Assets/UI/Player/Game_Player_Moves_Icon_Active.png"
+		texture.texture = sprite_move_active
 		container.add_child(texture)
 	
 	for x in max_moves - curr_moves:
 		var texture = TextureRect.new()
-		texture.texture = "res://Assets/UI/Player/Game_Player_Moves_Icon_Used.png"
+		texture.texture = sprite_move_used
 		container.add_child(texture)
 		
 func update_turn_icon():

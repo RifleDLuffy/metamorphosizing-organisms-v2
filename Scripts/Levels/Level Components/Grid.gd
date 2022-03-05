@@ -1,5 +1,22 @@
 extends Node2D
 
+# debug matches to test grid
+const match_wide = [[0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 6, 6, 0, 0], 
+					[0, 0, 6, 6, 6, 0, 0], 
+					[0, 6, 6, 6, 6, 6, 0], 
+					[6, 6, 6, 6, 6, 6, 6]]
+const match_stairs = [[6, 0, 0, 0, 0, 0, 0],
+					  [6, 6, 0, 0, 0, 0, 0], 
+					  [6, 6, 6, 0, 0, 0, 0], 
+					  [6, 6, 6, 6, 0, 0, 0], 
+					  [6, 6, 6, 6, 6, 0, 0]]
+const plus = [[0, 0, 0, 6, 0, 0, 0],
+			  [0, 0, 0, 6, 0, 0, 0], 
+			  [6, 6, 6, 6, 6, 6, 6], 
+			  [0, 0, 0, 6, 0, 0, 0], 
+			  [0, 0, 0, 6, 0, 0, 0]]
+
 # [num rows, num cols]
 const grid_size = [5,7]
 const tile_scale_factor = 0.25
@@ -26,7 +43,10 @@ func _ready():
 	rng.randomize()
 	create_empty_grid()
 	initialize_grid()
-	remove_matched_tiles_and_fill_grid(find_matches_in_grid())
+	$Tween.interpolate_callback(self, 1, "remove_matched_tiles_and_fill_grid", match_stairs)
+	$Tween.start()
+	# remove_matched_tiles_and_fill_grid(match_stairs)
+	# remove_matched_tiles_and_fill_grid(find_matches_in_grid())
 	print_grid("grid", grid_matrix)
 
 var rng = RandomNumberGenerator.new()
@@ -133,8 +153,8 @@ func remove_matched_tiles_and_fill_grid(matches):
 	for y in range(grid_size[0]):
 		for x in range(grid_size[1]):
 			if matches[y][x] != 0:
-				grid_tex[y][x].visible = false
-				grid_tex[y][x].queue_free()
+				# Tile will have a disappear animation but the place it occupied will be null
+				remove_tile(y, x, grid_tex[y][x]);
 				grid_tex[y][x] = null
 	
 	# We want to iterate from the bottom row up
@@ -173,14 +193,48 @@ func remove_matched_tiles_and_fill_grid(matches):
 
 func vec_sum(array):
 	return array[0] + array[1]
+	
+# The formula for calculating the amount of time it takes a tile to fall is...
+# base_seconds_per_tile + distance * seconds_per_tile * seconds_per_tile_scale
+# 1 + distance * 0.25 * 0.25 or 1 + distance / 16
 
+# The miniumum amount of time the falling animation can take
+const base_seconds_per_tile = 1
 # This is the speed of the movement of the tile
 # Eg: 2 -> 2 seconds to move from [3,4] to [2,4]
-const seconds_per_tile = 1
+const seconds_per_tile = 0.25
+# How much more the seconds_per_tile can deviate from the base value
+# 
+# Eg: If a tile that falls 1 tile down takes 1 second to fall
+# With a scale of 0.5, A tile that falls 1 tile down will take 0.5 seconds instead
+const second_per_tile_scale = 0.25
+# The delay before the tiles move to their current location
+# allows the disappearing animation to be more visible
+const tile_move_delay = 0.5
+
 func move_tile(y, x, tile):
 	var destination = Vector2(x, y) * sprite_size * tile_scale_factor
-	var duration = vec_sum((tile.position - destination).abs()) / (sprite_size*tile_scale_factor) * seconds_per_tile
-	$Tween.interpolate_property(tile, "position", tile.position, destination, duration, Tween.TRANS_BOUNCE, Tween.EASE_OUT)
+	var duration = base_seconds_per_tile + vec_sum((tile.position - destination).abs()) / (sprite_size*tile_scale_factor) * seconds_per_tile * seconds_per_tile
+	$Tween.interpolate_property(tile, "position", tile.position, destination, duration, Tween.TRANS_BOUNCE, Tween.EASE_OUT, tile_move_delay)
+
+# The speed of the disappearing animation
+const tile_disappear_speed = 1
+
+func remove_tile(y, x, tile):
+	var duration = tile_disappear_speed
+	# Without tweening to the center, the sprites' sizes will decrease but into a corner
+	# instead of the middle
+	var center = Vector2(x + 0.5, y + 0.5) * sprite_size * tile_scale_factor
+	
+	$Tween.interpolate_property(tile, "scale", tile.scale, Vector2(0, 0), duration, Tween.TRANS_SINE, Tween.EASE_OUT)
+	$Tween.interpolate_property(tile, "position", tile.position, center, duration, Tween.TRANS_SINE, Tween.EASE_OUT)
+	
+	# Delete the tile after we are finished with the animation
+	$Tween.interpolate_callback(self, duration, "delete_tile", tile)
+	$Tween.start()
+	
+func delete_tile(tile):
+	tile.queue_free()
 
 # Look upwards in the grid until you find an unmatched tile
 func find_unmatched_tile(y, x, matches):
